@@ -2,6 +2,10 @@
   "name": "next-request-metadata",
   "version": "1.0.0",
   "description": "Next.js SSR request metadata context",
+  "author": "Dominik Mondzik",
+  "engines": {
+    "node": ">=v16.4.0",
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -11,11 +15,22 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
   },
-  "author": "Dominik Mondzik",
-  "license": "ISC",
   "devDependencies": {
     "@types/node": "^24.1.0",
     "typescript": "^5.9.2"
   },
-  "type": "module"
+  "type": "module",
+  "keywords": [
+    "Next.js request logs",
+    "x-request-id",
+    "Log middleware",
+    "Log metadata",
+    "Log context"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mondzikd/next-request-metadata"
+  },
+  "bugs": "https://github.com/mondzikd/next-request-metadata",
+  "license": "ISC",
 }

@@ -1,0 +1,11 @@
+{
+  "name": "next-request-metadata",
+  "version": "1.0.0",
+  "description": "Next.js SSR request metadata context",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dominik Mondzik",
+  "license": "ISC"
+}

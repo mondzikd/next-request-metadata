@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "node16",
+    "module": "node18",
     "target": "es2020", // set to the *lowest* target you support
     "strict": true,
     "verbatimModuleSyntax": true,

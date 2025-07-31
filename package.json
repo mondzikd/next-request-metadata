@@ -4,7 +4,7 @@
   "description": "Next.js SSR request metadata context",
   "author": "Dominik Mondzik",
   "engines": {
-    "node": ">=v16.4.0",
+    "node": ">=v16.4.0"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -32,5 +32,5 @@
     "url": "https://github.com/mondzikd/next-request-metadata"
   },
   "bugs": "https://github.com/mondzikd/next-request-metadata",
-  "license": "ISC",
+  "license": "ISC"
 }

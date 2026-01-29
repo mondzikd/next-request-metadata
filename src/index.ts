@@ -21,7 +21,7 @@ const getRequestId = (context: GetServerSidePropsContext): string => {
  * Also showcases passing metadata to response headers.
  */
 const prepareMetadataDefault = (
-  context: GetServerSidePropsContext
+  context: GetServerSidePropsContext,
 ): Metadata => {
   const requestId = getRequestId(context);
 
@@ -30,11 +30,18 @@ const prepareMetadataDefault = (
   return { "x-request-id": requestId };
 };
 
+/**
+ * Next.js getServerSideProps wrapper to share metadata context across nested functions.
+ *
+ * @param getServerSideProps original getServerSideProps functions, which nested functions will share metadata context
+ * @param prepareMetadata function preparing metadata for that will be shared in the context
+ * @returns original getServerSideProps wrapped with metadata context
+ */
 export const metadataRequestWrapper = <T extends { [key: string]: any }>(
   getServerSideProps: GetServerSideProps<T>,
   prepareMetadata: (
-    context: GetServerSidePropsContext
-  ) => Metadata = prepareMetadataDefault
+    context: GetServerSidePropsContext,
+  ) => Metadata = prepareMetadataDefault,
 ): GetServerSideProps<T> => {
   return (context) => {
     const store = prepareMetadata(context);
@@ -42,6 +49,11 @@ export const metadataRequestWrapper = <T extends { [key: string]: any }>(
   };
 };
 
+/**
+ * Gets metadata from the current request context.
+ *
+ * @returns metadata created by prepareMetadata passed as an argument to metadataRequestWrapper
+ */
 export const getMetadata = () => {
   return asyncLocalStorage.getStore() || {};
 };

@@ -3,6 +3,7 @@
     "module": "node18",
     "target": "es2020", // set to the *lowest* target you support
     "strict": true,
+    "noUncheckedIndexedAccess": true,
     "verbatimModuleSyntax": true,
     "declaration": true,
     "sourceMap": true,

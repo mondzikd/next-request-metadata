@@ -1,7 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { randomUUID } from "node:crypto";
 
-export type Metadata = Record<string, string | number | boolean>;
+export interface Metadata extends Record<PropertyKey, any> {}
 
 type MetadataRequestWrapper = <Args extends any[], R>(
   original: (...args: Args) => R,
@@ -88,8 +88,8 @@ const prepareMetadataDefault = (...args: unknown[]): Metadata => {
   ) {
     return prepareRequestIdMetadata({ req: args[0], res: args[1] });
   }
-
-  return {};
+  return [];
+  return { asdf: null, [Symbol()]: 123 };
 };
 
 /**

@@ -32,7 +32,7 @@ export const getServerSideProps = metadataRequestWrapper(async (context) => {
 //   someProp: string;
 // };
 
-// Alternative: Using explicit typing for original getServerSideProps
+// // Alternative: Using explicit typing for original getServerSideProps
 // const originalGetServerSideProps: GetServerSideProps<
 //   SSRExamplePageProps
 // > = async (context) => {

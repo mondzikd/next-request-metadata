@@ -1,11 +1,11 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { randomUUID } from "node:crypto";
 
-export type Metadata = Record<PropertyKey, any>;
+type Metadata = Record<PropertyKey, any>;
 
-type MetadataRequestWrapper = <Args extends any[], R>(
+type MetadataRequestWrapper<M> = <Args extends any[], R>(
   original: (...args: Args) => R,
-  prepareMetadata?: (...args: Args) => Metadata,
+  prepareMetadata?: (...args: Args) => M,
 ) => (...args: Args) => R;
 
 type DefaultMinimalRequest = { headers: { "x-request-id"?: string } };
@@ -18,8 +18,6 @@ type DefaultMinimalContext = {
   req: DefaultMinimalRequest;
   res: DefaultMinimalResponse;
 };
-
-const asyncLocalStorage = new AsyncLocalStorage<Metadata>();
 
 const isRequestLike = (obj: unknown): obj is DefaultMinimalRequest => {
   return (
@@ -93,29 +91,57 @@ const prepareMetadataDefault = (...args: unknown[]): Metadata => {
 };
 
 /**
- * Next.js getServerSideProps wrapper to share metadata context across nested functions.
+ * Sets up metadata context management. It allows storing data throughout the lifetime of
+ * a web request or any other asynchronous duration. It's similar to thread-local storage
+ * in other languages.
  *
- * @param original getServerSideProps function, that nested functions will share metadata context.
- * @param prepareMetadata function preparing metadata, that will be shared in the context. Context
- *                        (first argument) passed to original function will be passed to prepareMetadata.
- *                        Defaults to storing x-request-id AND also injecting it to context.res.headers.
- * @returns original getServerSideProps wrapped with metadata context.
+ * @param prepareMetadata function preparing metadata, that will be shared in the context.
+ * @returns metadataRequestWrapper and getMetadata functions.
  */
-export const metadataRequestWrapper: MetadataRequestWrapper = (
-  original,
-  prepareMetadata = prepareMetadataDefault,
+const setup = <RequestMetadata>(
+  prepareMetadata: (...args: any[]) => RequestMetadata,
 ) => {
-  return (...args) => {
-    const store = prepareMetadata(...args);
-    return asyncLocalStorage.run(store, original, ...args);
+  const asyncLocalStorage = new AsyncLocalStorage<RequestMetadata>();
+
+  /**
+   * General purpose request metadata context wrapper. Can be used to wrap Next.js SSR
+   * getServerSideProps or API handlers functions, to share request metadata context across
+   * nested function invokes.
+   *
+   * @param original function to be wrapped with metadata context. It's nested functions will share
+   * metadata context.
+   * @param prepareMetadata function preparing metadata, that will be shared in the context. Context
+   * (first argument) passed to original function will be passed to prepareMetadata.Defaults to
+   * storing x-request-id AND also injecting it to context.res.headers.
+   * @returns original getServerSideProps wrapped with metadata context.
+   */
+  const metadataRequestWrapper: MetadataRequestWrapper<RequestMetadata> = (
+    original,
+    prepareRequestMetadata = prepareMetadata,
+  ) => {
+    return (...args) => {
+      const store = prepareRequestMetadata(...args);
+      return asyncLocalStorage.run(store, original, ...args);
+    };
   };
+
+  /**
+   * Gets metadata from the current request context created inside metadataRequestWrapper.
+   *
+   * @returns metadata created by prepareMetadata function, if getMetadata is called inside
+   * metadataRequestWrapper. Undefined if getMetadata is called outside of metadataRequestWrapper.
+   */
+  const getMetadata = () => {
+    return asyncLocalStorage.getStore();
+  };
+
+  return { metadataRequestWrapper, getMetadata };
 };
 
-/**
- * Gets metadata from the current request context.
- *
- * @returns metadata created by prepareMetadata passed as an argument to metadataRequestWrapper
- */
-export const getMetadata = () => {
-  return asyncLocalStorage.getStore() || {};
-};
+const { metadataRequestWrapper, getMetadata } = setup<Metadata>(
+  prepareMetadataDefault,
+);
+
+export type { Metadata };
+export { metadataRequestWrapper, getMetadata, prepareMetadataDefault };
+export default setup;

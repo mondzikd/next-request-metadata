@@ -1,7 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { randomUUID } from "node:crypto";
 
-export type Metadata = Record<string, string | number | boolean>;
+export type Metadata = Record<PropertyKey, any>;
 
 type MetadataRequestWrapper = <Args extends any[], R>(
   original: (...args: Args) => R,

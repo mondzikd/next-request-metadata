@@ -77,7 +77,7 @@ const prepareRequestIdMetadata = (context: DefaultMinimalContext): Metadata => {
  * Also showcases passing metadata to response headers.
  */
 const prepareMetadataDefault = (...args: unknown[]): Metadata => {
-  if ((args.length === 1, isContextLike(args[0]))) {
+  if (args.length === 1 && isContextLike(args[0])) {
     return prepareRequestIdMetadata(args[0]);
   } else if (
     args.length === 2 &&

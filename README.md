@@ -1,12 +1,23 @@
 # next-request-metadata
 
+Lightweight utility to create and share per-request metadata for Next.js standalone mode apps.
+
+Share `x-request-id` and more across SSR getServerSideProps and API handler call stack without a need to pass down arguments.
+
 ## Installation
 
-```
+```sh
 npm install next-request-metadata
+# or
+yarn add next-request-metadata
 ```
 
-## Basic usage
+## Quickstart
+
+- Wrap API handler or getServerSideProps with `metadataRequestWrapper()`.
+- Call `getMetadata()` from any nested function inside the wrapped call to access the current request metadata.
+
+getServerSideProps (SSR) example:
 
 ```TypeScript
 // SSR page
@@ -14,24 +25,31 @@ import { metadataRequestWrapper } from "next-request-metadata";
 import { calculateSomething } from "@/helperFuntion";
 
 export const getServerSideProps = metadataRequestWrapper(async (context) => {
-  const someProp = calculateSomething(); // nested functions will share request metadata
+  const someProp = calculateSomething(); // functions will share request metadata
 
   return {
     props: { someProp },
   };
 });
-
-export const SSRExamplePage: NextPage<
-  InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ someProp }) => {
-  return (
-    <div>
-      <h1>SSR Example Page</h1>
-      <p>Some Prop: {someProp}</p>
-    </div>
-  );
-};
 ```
+
+API route example:
+
+```TypeScript
+// API route
+import { metadataRequestWrapper } from "next-request-metadata";
+import { calculateSomething } from "@/helperFuntion";
+
+const handler = (req, res) => {
+  const something = calculateSomething(); // functions will share request metadata
+  res.status(200).json({ something });
+};
+
+// Use prepareMetadataDefault to ensure x-request-id is set on the response.
+export default metadataRequestWrapper(handler);
+```
+
+Functions in the middle - no need to pass down metadata in arguments:
 
 ```TypeScript
 // helperFuntion.ts
@@ -44,17 +62,31 @@ export const calculateSomething = () => {
 };
 ```
 
+Shared request metadata consumer:
+
 ```TypeScript
 // logger.ts
 import { getMetadata } from "next-request-metadata";
 
-export const logger = (message) => {
+export const logger = (message: string) => {
   const requestMetadata = getMetadata();
 
-  console.log(requestMetadata, message);
+  console.log(`[LOG]: ${JSON.stringify({ ...requestMetadata, message })}`);
 };
 ```
 
-See [examples](./examples/next-pino/)!
+Result for both API handler and getServerSideProps:
 
-## API
+- log messages:
+  `[LOG]: {"x-request-id":"94496d60-0420-43c8-a446-89735cb4f036","message":"Calculating something"}`
+- HTTP response:
+  `HTTP/1.1 200 OK`
+  `x-request-id: 94496d60-0420-43c8-a446-89735cb4f036`
+
+## Examples
+
+See ideas described above in more advanced [examples](https://github.com/mondzikd/next-request-metadata/examples/next-pino/).
+
+## Performance
+
+TBC

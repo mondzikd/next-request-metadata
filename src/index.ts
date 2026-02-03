@@ -1,9 +1,3 @@
-/**
- * next-request-metadata
- *
- * Small utility to share per-request metadata using Node's AsyncLocalStorage.
- */
-
 import { AsyncLocalStorage } from "node:async_hooks";
 import { randomUUID } from "node:crypto";
 

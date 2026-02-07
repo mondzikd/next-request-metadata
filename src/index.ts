@@ -12,7 +12,7 @@ type MetadataRequestWrapper<M> = <Args extends any[], R>(
  *                        passed to metadataRequestWrapper wrapped function.
  * @returns metadataRequestWrapper and getMetadata functions.
  */
-const setup = <RequestMetadata>(
+export const setup = <RequestMetadata>(
   prepareMetadata: (...args: any[]) => RequestMetadata,
 ) => {
   const asyncLocalStorage = new AsyncLocalStorage<RequestMetadata>();
@@ -51,5 +51,3 @@ const setup = <RequestMetadata>(
 
   return { metadataRequestWrapper, getMetadata };
 };
-
-export default setup;

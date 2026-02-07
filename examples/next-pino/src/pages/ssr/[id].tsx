@@ -4,14 +4,14 @@ import {
   InferGetServerSidePropsType,
   NextPage,
 } from "next";
-import { metadataRequestWrapper } from "../../../../../src";
+import { logMetadataRequestWrapper } from "../../lib/logger";
 
 /**
  * Example of a Next.js page that uses getServerSideProps with metadata logging on the server.
  *
- * Because of metadataRequestWrapper we don't have to manually pass down metadata to invoked functions.
+ * Because of logMetadataRequestWrapper we don't have to manually pass down metadata to invoked functions.
  */
-export const getServerSideProps = metadataRequestWrapper(async (context) => {
+export const getServerSideProps = logMetadataRequestWrapper(async (context) => {
   const id = context.params?.id;
 
   if (typeof id !== "string") {
@@ -52,7 +52,7 @@ export const getServerSideProps = metadataRequestWrapper(async (context) => {
 //   };
 // };
 
-// export const getServerSideProps = metadataRequestWrapper(
+// export const getServerSideProps = logMetadataRequestWrapper(
 //   originalGetServerSideProps,
 // );
 

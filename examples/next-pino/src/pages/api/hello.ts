@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { metadataRequestWrapper } from "../../../../../src";
+import { logMetadataRequestWrapper } from "../../lib/logger";
 
 type Data = {
   name: string;
@@ -10,4 +10,4 @@ function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
   res.status(200).json({ name: "John Doe" });
 }
 
-export default metadataRequestWrapper(handler);
+export default logMetadataRequestWrapper(handler);

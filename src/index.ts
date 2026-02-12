@@ -1,47 +1,58 @@
 import { AsyncLocalStorage } from "node:async_hooks";
+import { prepareRequestIdMetadata } from "./presets/requestId";
 
-type MetadataRequestWrapper<M> = <Args extends any[], R>(
+type MetadataRequestWrapper = <Args extends any[], R>(
   original: (...args: Args) => R,
-  prepareMetadata?: (...args: Args) => M,
 ) => (...args: Args) => R;
 
+export function setup(): {
+  metadataRequestWrapper: MetadataRequestWrapper;
+  getMetadata: () => ReturnType<typeof prepareRequestIdMetadata> | undefined;
+};
+
+export function setup<RequestMetadata>(
+  prepareMetadata: (...args: any[]) => RequestMetadata,
+): {
+  metadataRequestWrapper: MetadataRequestWrapper;
+  getMetadata: () => RequestMetadata | undefined;
+};
+
 /**
- * Create a request-metadata manager.
+ * Creates a request-metadata functions, sharing per-call context generated with prepareMetadata
+ * argument. Works like a middleware that allows to share metadata across nested function calls
+ * without passing it down as an argument.
  *
  * @param prepareMetadata function that builds the RequestMetadata object from the arguments
- *                        passed to metadataRequestWrapper wrapped function.
+ *                        passed to metadataRequestWrapper wrapped function. Defaults to
+ *                        x-request-id with setting response header side-effect.
+ * // or
+ * @param prepareMetadata function that builds the RequestMetadata object from the arguments
  * @returns metadataRequestWrapper and getMetadata functions.
  */
-export const setup = <RequestMetadata>(
-  prepareMetadata: (...args: any[]) => RequestMetadata,
-) => {
-  const asyncLocalStorage = new AsyncLocalStorage<RequestMetadata>();
+export function setup(
+  prepareMetadata: (...args: any[]) => any = prepareRequestIdMetadata,
+) {
+  const asyncLocalStorage = new AsyncLocalStorage();
 
   /**
-   * Wrap a function with a per-call metadata store.
+   * Wraps a function with a per-call metadata.
    *
    * Can be used to wrap Next.js SSR getServerSideProps or API handlers functions, to share request
    * metadata context across nested functions.
    *
    * @param original function to be wrapped with metadata context. It's nested functions will share
    *                 metadata context.
-   * @param prepareRequestMetadata optional that builds the RequestMetadata object from the
-   *                               arguments passed to wrapped function. Defaults to the
-   *                               prepareMetadata from setup module.
    * @returns original getServerSideProps wrapped with metadata context.
    */
-  const metadataRequestWrapper: MetadataRequestWrapper<RequestMetadata> = (
-    original,
-    prepareRequestMetadata = prepareMetadata,
-  ) => {
+  const metadataRequestWrapper: MetadataRequestWrapper = (original) => {
     return (...args) => {
-      const store = prepareRequestMetadata(...args);
+      const store = prepareMetadata(...args);
       return asyncLocalStorage.run(store, original, ...args);
     };
   };
 
   /**
-   * Get metadata for the current asynchronous context created by metadataRequestWrapper.
+   * Gets metadata for the current asynchronous context created by metadataRequestWrapper.
    *
    * @returns the RequestMetadata object, or `undefined` if called outside of a wrapped invocation.
    */
@@ -50,4 +61,4 @@ export const setup = <RequestMetadata>(
   };
 
   return { metadataRequestWrapper, getMetadata };
-};
+}

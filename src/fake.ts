@@ -1,5 +1,5 @@
-export const setup = (prepareMetadataDefault: any) => {
-  const metadataRequestWrapper = (original: any, prepareMetadata?: any) => {
+const fakeHandlersFactory = (prepareMetadataDefault: any) => {
+  const metadataRequestWrapper = (original: any) => {
     return original;
   };
 
@@ -9,3 +9,5 @@ export const setup = (prepareMetadataDefault: any) => {
 
   return { metadataRequestWrapper, getMetadata };
 };
+
+export default fakeHandlersFactory;

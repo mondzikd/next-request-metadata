@@ -60,7 +60,7 @@ const getRequestId = (context: DefaultMinimalContext): string => {
   return randomUUID();
 };
 
-const prepareRequestIdMetadata = (
+const _prepareRequestIdMetadata = (
   context: DefaultMinimalContext,
 ): XRequestIdMetadata => {
   const requestId = getRequestId(context);
@@ -87,18 +87,20 @@ const prepareRequestIdMetadata = (
  * Side effects:
  *  - Mutates the response by calling `res.setHeader("x-request-id", ...)`.
  *
- * @param args either a single context object ({ req, res }) or (req, res)
+ * @param args Next.js request context - either a single object ({ req, res }) or (req, res)
  * @returns object containing "x-request-id"
  */
-export const prepareMetadata = (...args: unknown[]): XRequestIdMetadata => {
+export const prepareRequestIdMetadata = (
+  ...args: unknown[]
+): XRequestIdMetadata => {
   if (args.length === 1 && isContextLike(args[0])) {
-    return prepareRequestIdMetadata(args[0]);
+    return _prepareRequestIdMetadata(args[0]);
   } else if (
     args.length === 2 &&
     isRequestLike(args[0]) &&
     isResponseLike(args[1])
   ) {
-    return prepareRequestIdMetadata({ req: args[0], res: args[1] });
+    return _prepareRequestIdMetadata({ req: args[0], res: args[1] });
   }
 
   return {};

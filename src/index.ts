@@ -5,12 +5,12 @@ type MetadataRequestWrapper = <Args extends any[], R>(
   original: (...args: Args) => R,
 ) => (...args: Args) => R;
 
-export function setup(): {
+function handlersFactory(): {
   metadataRequestWrapper: MetadataRequestWrapper;
   getMetadata: () => ReturnType<typeof prepareRequestIdMetadata> | undefined;
 };
 
-export function setup<RequestMetadata>(
+function handlersFactory<RequestMetadata>(
   prepareMetadata: (...args: any[]) => RequestMetadata,
 ): {
   metadataRequestWrapper: MetadataRequestWrapper;
@@ -22,26 +22,25 @@ export function setup<RequestMetadata>(
  * argument. Works like a middleware that allows to share metadata across nested function calls
  * without passing it down as an argument.
  *
- * @param prepareMetadata function that builds the RequestMetadata object from the arguments
- *                        passed to metadataRequestWrapper wrapped function. Defaults to
- *                        x-request-id with setting response header side-effect.
- * // or
- * @param prepareMetadata function that builds the RequestMetadata object from the arguments
+ * @param [prepareMetadata=prepareRequestIdMetadata] function that builds the RequestMetadata object
+ *        from the arguments passed to metadataRequestWrapper wrapped function.
+ *        Defaults to {@link prepareRequestIdMetadata}.
  * @returns metadataRequestWrapper and getMetadata functions.
  */
-export function setup(
+function handlersFactory(
   prepareMetadata: (...args: any[]) => any = prepareRequestIdMetadata,
 ) {
   const asyncLocalStorage = new AsyncLocalStorage();
 
   /**
-   * Wraps a function with a per-call metadata.
+   * Wraps a function with a per-call metadata, prepared with prepareMetadata factory function
+   * argument.
    *
    * Can be used to wrap Next.js SSR getServerSideProps or API handlers functions, to share request
    * metadata context across nested functions.
    *
    * @param original function to be wrapped with metadata context. It's nested functions will share
-   *                 metadata context.
+   *        metadata context.
    * @returns original getServerSideProps wrapped with metadata context.
    */
   const metadataRequestWrapper: MetadataRequestWrapper = (original) => {
@@ -62,3 +61,5 @@ export function setup(
 
   return { metadataRequestWrapper, getMetadata };
 }
+
+export default handlersFactory;

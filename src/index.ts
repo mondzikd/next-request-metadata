@@ -1,7 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
-import { prepareRequestIdMetadata } from "./presets/requestId";
+import { prepareRequestIdMetadata } from "./presets/requestId.js";
 
-type MetadataRequestWrapper = <Args extends any[], R>(
+type MetadataRequestWrapper = <Args extends unknown[], R>(
   original: (...args: Args) => R,
 ) => (...args: Args) => R;
 
@@ -11,7 +11,7 @@ function handlersFactory(): {
 };
 
 function handlersFactory<RequestMetadata>(
-  prepareMetadata: (...args: any[]) => RequestMetadata,
+  prepareMetadata: (...args: unknown[]) => RequestMetadata,
 ): {
   metadataRequestWrapper: MetadataRequestWrapper;
   getMetadata: () => RequestMetadata | undefined;
@@ -28,7 +28,7 @@ function handlersFactory<RequestMetadata>(
  * @returns metadataRequestWrapper and getMetadata functions.
  */
 function handlersFactory(
-  prepareMetadata: (...args: any[]) => any = prepareRequestIdMetadata,
+  prepareMetadata: (...args: unknown[]) => unknown = prepareRequestIdMetadata,
 ) {
   const asyncLocalStorage = new AsyncLocalStorage();
 

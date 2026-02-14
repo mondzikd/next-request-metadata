@@ -1,5 +1,5 @@
-const fakeHandlersFactory = (prepareMetadataDefault: any) => {
-  const metadataRequestWrapper = (original: any) => {
+const fakeHandlersFactory = () => {
+  const metadataRequestWrapper = (original: unknown) => {
     return original;
   };
 

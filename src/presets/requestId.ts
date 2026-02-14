@@ -7,7 +7,7 @@ export interface XRequestIdMetadata {
 type DefaultMinimalRequest = { headers: { "x-request-id"?: string } };
 
 type DefaultMinimalResponse = {
-  setHeader: (key: string, value: string | readonly string[] | number) => any;
+  setHeader: (key: string, value: string | readonly string[] | number) => void;
 };
 
 type DefaultMinimalContext = {

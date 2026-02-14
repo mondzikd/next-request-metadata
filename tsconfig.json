@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "es2015",
+    "module": "node16",
     "target": "es2017",
     "strict": true,
     "noUncheckedIndexedAccess": true,

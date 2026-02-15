@@ -6,14 +6,24 @@ type MetadataRequestWrapper = <Args extends unknown[], R>(
 ) => (...args: Args) => R;
 
 function handlersFactory(): {
-  metadataRequestWrapper: MetadataRequestWrapper;
+  metadataRequestWrapper: <
+    Args extends Parameters<typeof prepareRequestIdMetadata>,
+    Res,
+  >(
+    original: (...args: Args) => Res,
+  ) => (...args: Args) => Res;
   getMetadata: () => ReturnType<typeof prepareRequestIdMetadata> | undefined;
 };
 
-function handlersFactory<RequestMetadata>(
-  prepareMetadata: (...args: unknown[]) => RequestMetadata,
+function handlersFactory<
+  PrepareMetadataArgs extends unknown[],
+  RequestMetadata,
+>(
+  prepareMetadata: (...args: PrepareMetadataArgs) => RequestMetadata,
 ): {
-  metadataRequestWrapper: MetadataRequestWrapper;
+  metadataRequestWrapper: <Args extends PrepareMetadataArgs, Res>(
+    original: (...args: Args) => Res,
+  ) => (...args: Args) => Res;
   getMetadata: () => RequestMetadata | undefined;
 };
 
@@ -27,9 +37,7 @@ function handlersFactory<RequestMetadata>(
  *        Defaults to {@link prepareRequestIdMetadata}.
  * @returns metadataRequestWrapper and getMetadata functions.
  */
-function handlersFactory(
-  prepareMetadata: (...args: unknown[]) => unknown = prepareRequestIdMetadata,
-) {
+function handlersFactory(prepareMetadata = prepareRequestIdMetadata) {
   const asyncLocalStorage = new AsyncLocalStorage();
 
   /**

@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "next": "16.1.5",
+    "next-logger": "^5.0.2",
+    "pino": "^10.3.0",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
@@ -20,5 +22,6 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.5",
     "typescript": "^5"
-  }
+  },
+  "type": "module"
 }

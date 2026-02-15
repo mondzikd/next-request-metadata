@@ -1,21 +1,22 @@
-import { setup } from "../../../../src/index";
-import { prepareMetadata } from "../../../../src/presets/requestId";
+import setup from "next-request-metadata";
+import pino from "pino";
 
-type Log = Record<PropertyKey, string | number | boolean>;
+const {
+  getMetadata: getLogRequestMetadata,
+  metadataRequestWrapper: logMetadataRequestWrapper,
+} = setup();
 
-const { getMetadata, metadataRequestWrapper: logMetadataRequestWrapper } =
-  setup(prepareMetadata);
+const logger = pino({
+  browser: { asObject: true, disabled: process.env.ENVIRONMENT === "production" },
+  formatters: {
+    level (label) {
+      return { level: label }
+    }
+  },
+  mixin() {
+    const requestMetadata = getLogRequestMetadata();
+    return requestMetadata ?? {};
+  },
+});
 
-const enrichedWithMetadata = (logObject: Log) => {
-  const metadata = getMetadata();
-  return { ...metadata, ...logObject };
-};
-
-/**
- * Simple console logger, that enriches the message with metadata before logging.
- */
-export const logger = (msg: Log) => {
-  console.log(`[LOG]: ${JSON.stringify(enrichedWithMetadata(msg))}`);
-};
-
-export { logMetadataRequestWrapper };
+export { logger, logMetadataRequestWrapper };

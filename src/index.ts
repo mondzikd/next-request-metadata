@@ -16,8 +16,10 @@ function handlersFactory(): {
 };
 
 function handlersFactory<
-  PrepareMetadataArgs extends unknown[],
-  RequestMetadata,
+  RequestMetadata = ReturnType<typeof prepareRequestIdMetadata>,
+  PrepareMetadataArgs extends unknown[] = Parameters<
+    typeof prepareRequestIdMetadata
+  >,
 >(
   prepareMetadata: (...args: PrepareMetadataArgs) => RequestMetadata,
 ): {
@@ -28,7 +30,7 @@ function handlersFactory<
 };
 
 /**
- * Creates a request-metadata functions, sharing per-call context generated with prepareMetadata
+ * Creates a requestMetadata instance, sharing per-call context generated with prepareMetadata
  * argument. Works like a middleware that allows to share metadata across nested function calls
  * without passing it down as an argument.
  *
@@ -41,8 +43,7 @@ function handlersFactory(prepareMetadata = prepareRequestIdMetadata) {
   const asyncLocalStorage = new AsyncLocalStorage();
 
   /**
-   * Wraps a function with a per-call metadata, prepared with prepareMetadata factory function
-   * argument.
+   * Wraps a function with a per-call metadata, prepared with prepareMetadata.
    *
    * Can be used to wrap Next.js SSR getServerSideProps or API handlers functions, to share request
    * metadata context across nested functions.
@@ -59,9 +60,10 @@ function handlersFactory(prepareMetadata = prepareRequestIdMetadata) {
   };
 
   /**
-   * Gets metadata for the current asynchronous context created by metadataRequestWrapper.
+   * Gets metadata for the current async request context, created by prepareMetadata per
+   * each metadataRequestWrapper wrapped function call.
    *
-   * @returns the RequestMetadata object, or `undefined` if called outside of a wrapped invocation.
+   * @returns the Metadata object, or `undefined` if called outside of a wrapped invocation.
    */
   const getMetadata = () => {
     return asyncLocalStorage.getStore();

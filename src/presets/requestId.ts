@@ -71,7 +71,7 @@ const _prepareRequestIdMetadata = (
 };
 
 /**
- * Prepare a minimal metadata object with `x-request-id`.
+ * Prepares a minimal metadata object with `x-request-id`.
  *
  * Calling conventions supported:
  *  - (context) where context is { req, res } - Next.js getServerSideProps

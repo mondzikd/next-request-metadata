@@ -19,4 +19,4 @@ const logger = pino({
   },
 });
 
-export { logger, logMetadataRequestWrapper };
+export { logger, getLogRequestMetadata, logMetadataRequestWrapper };

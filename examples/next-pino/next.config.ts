@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
       "next-request-metadata": { browser: "next-request-metadata/fake" },
     },
   },
+  output: "standalone",
 };
 
 export default nextConfig;

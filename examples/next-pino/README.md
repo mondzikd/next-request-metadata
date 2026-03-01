@@ -28,6 +28,8 @@ Open [http://localhost:3000/ssr/12345](http://localhost:3000/ssr/12345) with you
 
 Logs are available in your terminal and injected x-request-id in HTTP response header.
 
+You can also call api [http://localhost:3000/api/hello](http://localhost:3000/api/hello) with your browser.
+
 ## Concepts
 
 ### Logger

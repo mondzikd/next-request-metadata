@@ -163,6 +163,33 @@ Gets metadata for the current async request context, created by prepareMetadata 
 
 Returns `Metadata` object, or `undefined` if called outside of a wrapped invocation.
 
+## Browser fake
+
+### Same logger in the browser
+
+next-request-metadata works in Node.js environment only, but you can use next-request-metadata in client-side code with bundler import alias for browser.
+
+`next.config.ts` with turbopack:
+
+```TypeScript
+turbopack: {
+  resolveAlias: {
+    "next-request-metadata": { browser: "next-request-metadata/fake" },
+  },
+},
+```
+
+`next.config.ts` with webpack:
+
+```TypeScript
+webpack: (config, options) => {
+  if (!options.isServer) {
+    config.resolve.alias["next-request-metadata"] = "next-request-metadata/fake";
+  }
+  return config;
+},
+```
+
 ## Performance
 
 TBC
